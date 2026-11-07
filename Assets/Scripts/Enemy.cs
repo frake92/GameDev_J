@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -8,6 +9,8 @@ public class Enemy : MonoBehaviour
 
     public float throwInterval = 2f;
     private float throwTimer;
+
+    private int health = 5;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -36,6 +39,16 @@ public class Enemy : MonoBehaviour
             GameObject ball = Instantiate(snowBallPrefab, transform.position, Quaternion.identity);
             ball.GetComponent<SnowBall>().Launch(dir, false);
             throwTimer = throwInterval;
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+        if(health <= 0)
+        {
+            Debug.Log("Az enemy legyőzve");
+            Destroy(gameObject);
         }
     }
 }

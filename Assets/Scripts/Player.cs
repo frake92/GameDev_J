@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -25,12 +26,19 @@ public class Player : MonoBehaviour
 
     private bool hasSnowball = false;
 
+    private Animator anim;
+
+    private int health = 5;
+
+    public SnowBallPickUp pickup;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -79,11 +87,13 @@ public class Player : MonoBehaviour
         }
         if (h != 0f || v != 0f)
         {
-            speed = 2f;
+            anim.SetFloat("Speed", 1f);
+            speed = 3f;
             direction = new Vector2(h, v).normalized;
         }
         else
         {
+            anim.SetFloat("Speed", 0f);
             speed = 0f;
             direction = Vector2.zero;
         }
@@ -115,6 +125,7 @@ public class Player : MonoBehaviour
 
         hasSnowball = true;
         Destroy(collision.gameObject);
+        pickup.Spawn();
 
         /*
         if (collision.CompareTag("Hóember"))
@@ -132,5 +143,22 @@ public class Player : MonoBehaviour
             SceneManager.LoadScene("Level2");
         }
         */
+    }
+
+    IEnumerator WaitForHitAnim()
+    {
+        anim.SetBool("Hit", true);
+        yield return new WaitForSeconds(0.3f);
+        anim.SetBool("Hit", false);
+    }
+
+    public void TakeDamage(int damage)
+    { 
+        health -= damage;
+        StartCoroutine(WaitForHitAnim());
+        if (health <= 0)
+        {
+            SceneManager.LoadScene("Level2");
+        }
     }
 }
